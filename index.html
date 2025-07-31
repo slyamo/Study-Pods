@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Study Pod Booking </title>
+  <style>
+    /* Base body styles: font, layout, background */
+    body {
+      font-family: "Trebuchet MS", Verdana, sans-serif; 
+      margin: 0;
+      padding: 0;
+      display: flex;                    
+      flex-direction: column;          
+      height: 100vh;                   
+      background: white;               
+      color: black;                    
+    }
+
+    /* Top navigation/header bar */
+    header {
+      display: flex;                  
+      align-items: center;            
+      background-color: #00205B;      
+      color: white;                   
+      padding: 10px 20px;             
+      position: sticky;               
+      top: 0;
+      z-index: 10;                    
+    }
+
+    /* Logo image inside header */
+    header img {
+      height: 50px;                   
+      margin-right: 15px;             
+    }
+
+    /* Header title (Study Pod Booking) */
+    header h1 {
+      font-size: 1.8rem;              
+      margin: 0;                     
+      flex: 1;                        
+      text-align: center;            
+    }
+
+    /* Layout container for form + bookings */
+    main {
+      display: flex;                  
+      flex: 1;                        
+    }
+
+    /* Shared styles for both panels */
+    .left-panel, .right-panel {
+      padding: 20px;                  
+      overflow-y: auto;               
+    }
+
+    /* Left section with form */
+    .left-panel {
+      width: 35%;                     
+      background-color: #f0f4f8;      
+      border-right: 2px solid #00205B;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    /* Stylish semi-transparent form container */
+    .glass-form {
+      background: rgba(255, 255, 255, 0.2);  
+      border-radius: 16px;                  
+      padding: 20px;                        
+      backdrop-filter: blur(10px);          
+      box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+      width: 80%;                           
+    }
+
+    /* Form section heading */
+    h2 {
+      color: #00205B;                
+      margin-top: 0;                 
+      text-align: center;
+    }
+
+    /* Input fields, select dropdowns, and buttons */
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* Submit button styling */
+    button {
+      background-color: #FFD100;     
+      font-weight: bold;             
+      cursor: pointer;               
+    }
+
+    /* Button hover effect */
+    button:hover {
+      background-color: gold;        
+    }
+
+    /* Validation/error messages below form */
+    #errors {
+      color: red;                    
+      margin-top: 10px;
+      min-height: 20px;              
+    }
+
+    /* Bookings table layout */
+    table {
+      width: 100%;                   
+      border-collapse: collapse;     
+      margin-top: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+      border-radius: 10px;           
+      overflow: hidden;
+    }
+
+    /* Table headers */
+    th {
+      background: #00205B;           
+      color: white;
+      padding: 10px;
+      text-align: left;
+    }
+
+    /* Table cells */
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #ccc; 
+      background: white;
+    }
+
+    /* Alternating row colors */
+    tr:nth-child(even) td {
+      background: #f9f9f9;
+    }
+
+    /* Hover effect for rows */
+    tr:hover td {
+      background: #e6f0ff;           
+    }
+
+    /* Remove button inside table */
+    .remove-btn {
+      display: inline-flex;          
+      justify-content: center;
+      align-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;            
+      background: #ddd;              
+      color: black;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;     
+    }
+
+    /* Remove button hover styling */
+    .remove-btn:hover {
+      background: red;
+      color: white;
+      box-shadow: 0 0 8px red;
+    }
+
+    /* Insights panel section */
+    #insights {
+      margin-top: 30px;
+    }
+
+    /* Grid layout for stats */
+    #statsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2 columns layout */
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    /* Individual stat display box */
+    .stat-box {
+      background: #e6f0ff;           
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Stat label text */
+    .stat-box strong {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+
+    /* Stat number */
+    .stat-box span {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: green;   
+    }
+
+    /* Fill rate bar container */
+    .bar-container {
+      background: #cce0ff;           
+      border-radius: 5px;
+      height: 20px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    /* Fill rate inner bar */
+    .bar-fill {
+      background: #00205B;           
+      height: 100%;
+      width: 0%;                     
+      color: white;
+      font-size: 12px;
+      text-align: right;
+      padding-right: 5px;
+      box-sizing: border-box;
+      transition: width 0.6s ease-out; 
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="usiu-logo.png" alt="USIU Logo">
+    <h1>Study Pod Booking</h1>
+  </header>
+  <main>
+    <div class="left-panel">
+      <div class="glass-form">
+        <h2>Book a Study Pod</h2>
+        <form id="bookingForm">
+          <label>Choose Pod:
+            <select id="podSelect"></select>
+          </label>
+          <label>Time (HH:MM):
+            <input type="time" id="timeInput" step="3600" required>
+          </label>
+          <label>Student IDs:
+            <input type="text" id="studentInput" placeholder="e.g., SIT-101,SIT-102">
+          </label>
+          <button type="submit">Book</button>
+        </form>
+        <div id="errors"></div>
+      </div>
+    </div>
+    <div class="right-panel">
+      <h2>Current Bookings</h2>
+      <table id="bookingsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pod</th>
+            <th>Time</th>
+            <th># Students</th>
+            <th>Student IDs</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="insights">
+        <h2>Insights</h2>
+        <div id="statsGrid">
+          <div class="stat-box">
+            <strong>Total Bookings</strong>
+            <span id="totalBookings">0</span>
+          </div>
+          <div class="stat-box">
+            <strong>Unique Students</strong>
+            <span id="uniqueStudents">0</span>
+          </div>
+          <div class="stat-box">
+            <strong>Flagged Duplicates</strong>
+            <span id="flaggedDuplicates">0</span>
+          </div>
+          <div class="stat-box">
+            <strong>Busiest Hour</strong>
+            <span id="busiestHour">N/A</span>
+          </div>
+        </div>
+        <h3>Fill Rate per Pod</h3>
+        <div id="podBars"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCRIPT SECTION -->
+<script>
+    // Define available study pods with fixed capacities
+    const pods = [
+      { id: "POD-A", capacity: 4 },
+      { id: "POD-B", capacity: 4 },
+      { id: "POD-C", capacity: 4 },
+      { id: "POD-D", capacity: 4 },
+      { id: "POD-E", capacity: 4 }
+    ];
+
+    // Initial booking data to pre-fill the table
+    let bookings = [
+      { podId: "POD-A", time: "09:00", students: ["SIT-001", "SIT-045"] },
+      { podId: "POD-B", time: "10:00", students: ["SMC-210"] }
+    ];
+
+    // Counter for invalid/duplicate booking attempts
+    let flaggedDuplicates = 0;
+
+    // DOM references
+    const podSelect = document.getElementById("podSelect");
+    const timeInput = document.getElementById("timeInput");
+    const studentInput = document.getElementById("studentInput");
+    const form = document.getElementById("bookingForm");
+    const errorsDiv = document.getElementById("errors");
+    const bookingsTableBody = document.querySelector("#bookingsTable tbody");
+
+    const totalBookingsSpan = document.getElementById("totalBookings");
+    const uniqueStudentsSpan = document.getElementById("uniqueStudents");
+    const flaggedDuplicatesSpan = document.getElementById("flaggedDuplicates");
+    const busiestHourSpan = document.getElementById("busiestHour");
+    const podBarsDiv = document.getElementById("podBars");
+
+    // Dynamically populate the pod dropdown
+    function populatePodOptions() {
+      for (let pod of pods) {
+        const opt = document.createElement("option");
+        opt.value = pod.id;
+        opt.textContent = pod.id;
+        podSelect.appendChild(opt);
+      }
+    }
+
+    // Clean and format student input list
+    function parseStudentIds(input) {
+      // Normalize to uppercase and remove empty entries
+      return input.split(",")
+        .map(id => id.trim().toUpperCase())
+        .filter(id => id !== "");
+    }
+
+    // Check if a time is within valid booking hours
+    function isWithinOperatingHours(time) {
+      return time >= "08:00" && time <= "20:00";
+    }
+
+    // Count how many students are booked in a specific pod/time
+    function totalBookedInSlot(podId, time) {
+      let count = 0;
+      for (let booking of bookings) {
+        if (booking.podId === podId && booking.time === time) {  // Uses strict equality (===) for comparisons below
+          count += booking.students.length;
+        }
+      }
+      return count;
+    }
+
+    // Check for duplicates in the same pod/time
+    function hasDuplicateInSameSlot(podId, time, studentIds) {
+      for (let booking of bookings) {
+        if (booking.podId === podId && booking.time === time) { // Uses strict equality
+          for (let s of studentIds) {
+            if (booking.students.includes(s)) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    // Ensure no student is double-booked in different pods at the same time
+    function hasCrossPodClash(studentIds, time, currentPodId) {
+      for (let booking of bookings) {
+        if (booking.time === time && booking.podId !== currentPodId) {
+          for (let s of studentIds) {
+            if (booking.students.includes(s)) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    // Main form submission handler
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      errorsDiv.textContent = "";
+
+      const podId = podSelect.value;
+      const time = timeInput.value;
+      const students = parseStudentIds(studentInput.value);
+
+      // Basic validation: required fields
+      if (!podId || !time || students.length === 0) {
+        errors.textContent = "Please fill in all fields.";
+        return;
+      }
+
+      // Check operating hours
+      if (!isWithinOperatingHours(time)) {
+        errors.textContent = "Invalid time: bookings allowed from 08:00 to 20:00.";
+        return;
+      }
+
+      // Prevent overbooking
+      const currentBooked = totalBookedInSlot(podId, time);
+      if (currentBooked + students.length > 4) {
+        errors.textContent = `Capacity exceeded: ${currentBooked} already booked. Only ${4 - currentBooked} seats remain.`;
+        return;
+      }
+
+      // Check for duplicate booking in same pod/time
+      if (hasDuplicateInSameSlot(podId, time, students)) {
+        flaggedDuplicates++;
+        updateInsights();
+        errors.textContent = "Duplicate booking: some students already booked in this pod at this time.";
+        return;
+      }
+
+      // Check for booking in another pod at same time
+      if (hasCrossPodClash(students, time, podId)) {
+        flaggedDuplicates++;
+        updateInsights();
+        errorsDiv.textContent = "Cross-pod conflict: a student is already booked elsewhere at this time.";
+        errorsDiv.style.color = "red";
+        return;
+      }
+
+      // All checks passed; add booking
+      bookings.push({ podId, time, students });
+      errorsDiv.textContent = "Booking successful!";
+      errorsDiv.style.color = "green";
+      studentInput.focus();
+
+      renderBookings();
+      updateInsights();
+      studentInput.value = "";
+    });
+
+    // Display bookings in the table
+    function renderBookings() {
+      bookingsTableBody.innerHTML = "";
+      for (let i = 0; i < bookings.length; i++) {
+        const b = bookings[i];
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${b.podId}</td>
+          <td>${b.time}</td>
+          <td>${b.students.length}</td>
+          <td>${b.students.join(", ")}</td>
+          <td><button class="remove-btn" data-index="${i}">🗑</button></td>
+        `;
+        bookingsTableBody.appendChild(row);
+      }
+    }
+
+    // Remove a booking when trash icon is clicked
+    bookingsTableBody.addEventListener("click", function(e) {
+      if (e.target.classList.contains("remove-btn")) {
+        const index = parseInt(e.target.dataset.index);
+        bookings.splice(index, 1);
+        renderBookings();
+        updateInsights();
+      }
+    });
+
+    // Recalculate and display insights
+    function updateInsights() {
+      totalBookingsSpan.textContent = bookings.length;
+      let allStudents = [];
+      for (let b of bookings) {
+        for (let s of b.students) {
+          if (!allStudents.includes(s)) allStudents.push(s);
+        }
+      }
+      //unique students
+      uniqueStudentsSpan.textContent = allStudents.length;
+
+      // Flagged Duplicates
+      flaggedDuplicatesSpan.textContent = flaggedDuplicates;
+
+      // Busiest Hour
+      let hourCounts = {};
+      for (let b of bookings) {
+        if (!hourCounts[b.time]) hourCounts[b.time] = 0;
+        hourCounts[b.time] += b.students.length;
+      }
+      let busiestHour = "N/A";
+      let max = 0;
+      for (let hour in hourCounts) {
+        if (hourCounts[hour] > max) {
+          busiestHour = `${hour} (${hourCounts[hour]} students)`;
+          max = hourCounts[hour];
+        }
+      }
+      busiestHourSpan.textContent = busiestHour;
+
+      // Fill Rate Bars
+      podBarsDiv.innerHTML = "";
+      for (let pod of pods) {
+        let booked = 0;
+        let usedSlots = [];
+        for (let b of bookings) {
+          if (b.podId === pod.id) {
+            booked += b.students.length;
+            if (!usedSlots.includes(b.time)) usedSlots.push(b.time);
+          }
+        }
+        let possible = pod.capacity * usedSlots.length;
+        let rate = possible === 0 ? 0 : (booked / possible) * 100;
+
+        createPodBar(podBarsDiv, pod.id, rate);
+      }
+    }
+
+    // Dynamically create a progress bar for each pod
+    function createPodBar(container, podId, rate) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = `<strong>${podId}</strong>`;
+      const barContainer = document.createElement("div");
+      barContainer.className = "bar-container";
+      const barFill = document.createElement("div");
+      barFill.className = "bar-fill";
+      barFill.textContent = `${Math.round(rate * 10) / 10}%`;
+      barContainer.appendChild(barFill);
+      wrapper.appendChild(barContainer);
+      container.appendChild(wrapper);
+
+      // Animate the width change for visual effect
+      setTimeout(() => {
+        barFill.style.width = rate + "%";
+      }, 50);
+    }
+
+    // Initial rendering when page loads
+    populatePodOptions();
+    renderBookings();
+    updateInsights();
+  </script>
+
+</body>
+
+</html>
