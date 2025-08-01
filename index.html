@@ -176,7 +176,7 @@
     /* Grid layout for stats */
     #statsGrid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr); /* 2 columns layout */
+      grid-template-columns: repeat(2, 1fr); 
       gap: 15px;
       margin-bottom: 20px;
     }
@@ -355,7 +355,7 @@
     function totalBookedInSlot(podId, time) {
       let count = 0;
       for (let booking of bookings) {
-        if (booking.podId === podId && booking.time === time) {  // Uses strict equality (===) for comparisons below
+        if (booking.podId === podId && booking.time === time) {  // Uses strict equality 
           count += booking.students.length;
         }
       }
@@ -427,7 +427,6 @@
         flaggedDuplicates++;
         updateInsights();
         errorsDiv.textContent = "Cross-pod conflict: a student is already booked elsewhere at this time.";
-        errorsDiv.style.color = "red";
         return;
       }
 
